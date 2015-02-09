@@ -1,0 +1,65 @@
+﻿@{
+    ViewBag.Title = "Que";
+}
+
+<div data-bind="withSlide: { data: selectedView, transition: ko.transitions.slide }">
+    <div data-bind="template: { name: templateName, data: data }"></div>
+</div>
+
+<script id="dashboard" type="text/html">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <button id="startstopbtn" data-bind="click: startStop, css: startStopCSS , text: startStopText"></button>
+            </div>
+        </div>
+        <div class="row" style="text-align: center;">
+            <div class="col-xs-12 col-sm-6 col-md-3" style="text-align: center; height:100%;width:100%;" data-bind="visible: shouldShowPitGauge">
+                <div id="pitGauge" style="height:100%;width:100%;"></div>
+                <input type="number" class="input-number" min="0" max="500" data-bind="value: pitSet, valueUpdate: 'afterkeydown'" />       
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-3" style="text-align: center; height:100%;width:100%;" data-bind="visible: shouldShowGauge1">
+                <div id="meat1Gauge" style="height:100%;width:100%;"></div>
+                <input data-bind="value: probe1Set" type="number" min="0" max="200" class="input-number" />
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-3" style="text-align: center; height:100%;width:100%;" data-bind="visible: shouldShowGauge2">
+                <div id="meat2Gauge" style="height:100%;width:100%;"></div>
+                <input data-bind="value: probe2Set" type="number" min="0" max="200" class="input-number" />
+            </div>
+            <div class="col-xs-12 col-sm-6 col-md-3" style="text-align: center; height:100%;width:100%;" data-bind="visible: shouldShowGauge3">
+                <div id="meat3Gauge" style="height:100%;width:100%;"></div>
+                <input data-bind="value: probe3Set" type="number" min="0" max="200" class="input-number" />
+            </div>
+        </div>
+    </div>
+</script>
+
+<script id="temperaturehistory" type="text/html">
+    <div class="container">
+        <div class="ct-chart"></div> 
+    </div>
+</script>
+
+<script id="settings" type="text/html">
+    <div class="container">
+        <form class="form-horizontal">
+            <fieldset>
+                <!-- Select Basic -->
+                <div class="form-group">
+                    <label class="col-md-4 control-label" for="selectGrill">Grill Type</label>
+                    <div class="col-md-4">
+                        <select id="selectGrill" name="selectGrill" class="form-control" data-bind="options:grillTypes, optionsText:'name', value:selectedGrill" />
+                    </div>
+                </div>
+                <!-- Button -->
+                <div class="form-group">
+                    <label class="col-md-4 control-label" for="saveButton"></label>
+                    <div class="col-md-4">
+                        <button id="saveButton" name="saveButton" data-bind="click: saveSettings" class="btn btn-success">Save</button>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+</script>
+
