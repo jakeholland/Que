@@ -2,6 +2,21 @@
 
 Parse.initialize("HtZwAbdY7IccFNKh84HeXEzrh5O4KmHb5fmGY0ry", "ahLgmci5A03sn0trzMNz25W5j9srbfgHIyi1pmPP"); // Hide somewhere
 
+// Spark Core login and device grab
+spark.login({username: 'jakeholland@me.com', password: 'Th5M0us3'});
+spark.on('login', function() {
+    spark.listDevices(function(err, devices) {
+        var device = devices[0];
+
+        console.log('Device name: ' + device.name);
+        console.log('- connected?: ' + device.connected);
+        console.log('- variables: ' + device.variables);
+        console.log('- functions: ' + device.functions);
+        console.log('- version: ' + device.version);
+        console.log('- requires upgrade?: ' + device.requiresUpgrade);
+    });
+});
+
 //-------- Que Controller ----------
 var pitGaugeTemp = 0;
 var probe1GaugeTemp = 0;
@@ -17,10 +32,12 @@ var tempObj = {
     probe2Temps: [],
     probe3Temps: []
 };
+
 var settingsObj = {
     type: '',
     active: false
 };
+
 var chartData = {
     labels: [],
     series: []
@@ -33,7 +50,6 @@ que.id = "oL1PFPa7b3";
 
 // Chatist options 
 var options = {
-  
     low: 0
 };
 
@@ -58,9 +74,7 @@ function getData(callback) {
         error: function (error) {
             parseResults = null;
         }
-    });
-    
-   
+    }); 
 }
 
 function updateTemps() {
@@ -138,6 +152,16 @@ function sendSetTemps() {
         probe2: dashboardView.probe1Set(),
         probe3: dashboardView.probe1Set()
     }
+    var tempString = dashboardView.pitSet() + "&" + dashboardView.probe1Set();
+
+    device.callFunction('changeTemps', tempString, function(err, data) {
+        if (err) {
+            console.log('An error occurred:', err);
+        } else {
+            console.log('Function called succesfully:', data);
+        }
+    });
+    
     que.set("setTemps", setTempsObj);
     // Save the object to Parse
     que.save();
@@ -239,6 +263,17 @@ var dashboardView = {
     startStop: function () {
         settingsObj.active = !settingsObj.active;
         dashboardView.active(settingsObj.active);
+
+        var startStop = settingsObj.active 'start':'stop';
+
+        // Save the object to Parse
+        device.callFunction('cookStartStop', startStop, function(err, data) {
+            if (err) {
+                console.log('An error occurred:', err);
+            } else {
+                console.log('Function called succesfully:', data);
+            }
+        });
         // Save the object to Parse
         que.set("settings", settingsObj);
         que.save();
@@ -431,15 +466,13 @@ $(document).ready(function () {
     
     //Apply knockout bindings
     ko.applyBindings(viewModel);
+});
 
-    // Force close for mobile view
-    $(".auto-close").click(function (event) {
+// Force close for mobile view
+$(".auto-close").click(function (event) {
 
-        if (screen.width <= 767) {
-            event.stopPropagation();
-            $(".navbar-collapse").collapse('hide'); 
-        }
-
-    });
-    
+    if (screen.width <= 767) {
+        event.stopPropagation();
+        $(".navbar-collapse").collapse('hide');
+    }
 });
