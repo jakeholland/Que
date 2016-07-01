@@ -1,8 +1,5 @@
-// Include these libraries
 #include "Thermistor/Thermistor.h"
 #include "Ubidots/Ubidots.h"
-#include "SparkTime/SparkTime.h"
-#include "elapsedMillis/elapsedMillis.h"
 #include "pid/pid.h"
 #include "Adafruit_SSD1306/Adafruit_SSD1306.h"
 
@@ -46,9 +43,10 @@ double output;
 //Specify the links and initial tuning parameters
 PID electricPID(&temp0, &output, &setTemp0, 2, 5, 1, PID::DIRECT);
 
-unsigned long windowStartTime;
+const int POST_RATE = 30000; // Time between posts, in ms.
+unsigned long lastPost = 0; // global variable to keep track of last post time
+unsigned long windowStartTime; // global variable to keep track of last PID
 bool cook = false;
-elapsedMillis timeElapsed;
 
 void setup()   {
   Serial.begin(9600);
@@ -87,8 +85,8 @@ void loop() {
 
 void tempHandler() {
 
-    if (timeElapsed > 3000) {
-        timeElapsed = 0; // Reset timer
+    if (lastPost + POST_RATE < millis()) {
+        lastPost = millis(); // Reset timer
 
         // Get temps in fahrenheit
         temp0 = Thermistor0.getTempF(true);
